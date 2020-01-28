@@ -142,44 +142,19 @@ end
 
 
 [BigArray, Array].test_it_man((1..27)) { |a|
-  a.select {|x| sleep x / 15; x > 5}
+  a.select { |x| sleep x / 15; x > 5 }
 }
 
 
-[BigArray, Array].each { |cl|
-  p ' ~~~~ ANY? for: ' + cl.to_s + ' ~~~~'
-  p 'ready...'
-  a = cl.new
-  p 'steady...'
-
-  (1..27).each {|x| a.push x}
-
-  puts a
-
-  p 'GO!'
-  start = Time.now
-  p a.any? {|x| sleep x / 15; x % 19 == 0}
-  tm = Time.now - start
-  p 'Finish'
-  p tm
+[BigArray, Array].test_it_man((1..27)) { |a|
+  a.any? { |x| sleep x / 15; x % 19 == 0 }
 }
 
+[BigArray, Array].test_it_man((1..27)) { |a|
+  a.all? { |x| sleep x / 15; x != 0 }
+}
 
-[BigArray, Array].each { |cl|
-  p ' ~~~~ MAP for: ' + cl.to_s + ' ~~~~'
-  p 'ready...'
-  a = cl.new
-  p 'steady...'
-
-  (1..27).each {|x| a.push x}
-
-  puts a
-
-  p 'GO!'
-  start = Time.now
-  a.map {|x| sleep x / 15; x ** x ** 5}
-  tm = Time.now - start
-  p 'Finish'
-  p tm
+[BigArray, Array].test_it_man((1..27)) { |a|
+  a.map { |x| sleep x / 15; x ** x ** 5 }
 }
 
