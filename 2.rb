@@ -24,9 +24,12 @@ class BigArray
     end.flatten
   end
 
-  def any?(&block)
+  # @param [Boolean] return_early what we return if checker return true
+  # @param [Proc] checker method which check results
+  # @param [Proc] block
+  def partial_calc(return_early, block, &checker)
     threads = split_content(block)
-    
+
     threads.cycle {
         |thread|
       print thread, ': ', thread.status, "\n"
@@ -34,7 +37,7 @@ class BigArray
         thread.join
         print "#{thread[:results]}", "\n"
         # this for any, for all the same
-        if thread[:results].any?
+        if checker.call thread[:results]
           print "WE FOUND IT, KILL ALL\n"
           threads.map {
               |th|
@@ -42,42 +45,22 @@ class BigArray
             th.kill
           }
           threads.clear
-          return true
+          return return_early
         else
           threads.delete(thread)
         end
       end
     }
-    
-    false
+
+    !return_early
+  end
+
+  def any?(&block)
+    partial_calc(true, block, &:any?) # OMG It was { |results| results.any? }
   end
 
   def all?(&block)
-    threads = split_content(block)
-
-    threads.cycle {
-        |thread|
-      print thread, ': ', thread.status, "\n"
-      if thread.status != 'run'
-        thread.join
-        print "#{thread[:results]}", "\n"
-        # this for any, for all the same
-        if !thread[:results].all?
-          print "WE FOUND IT, KILL ALL\n"
-          threads.map {
-              |th|
-            print "Kill #{th}\n"
-            th.kill
-          }
-          threads.clear
-          return false
-        else
-          threads.delete(thread)
-        end
-      end
-    }
-
-    true
+    partial_calc(false, block) { |results| !results.all? }
   end
 
   def select(&block)
